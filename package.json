@@ -1,5 +1,5 @@
 {
-  "name": "aethel",
+  "name": "lumina-notes",
   "version": "1.0.0",
   "description": "A canvas for clarity - An infinite canvas that helps humans think better and solve problems through Socratic questioning",
   "type": "module",
@@ -17,7 +17,6 @@
     "@mui/icons-material": "^5.15.7",
     "@mui/material": "^5.15.7",
     "@xyflow/react": "^12.8.2",
-    "mongodb": "^6.17.0",
     "openai": "^5.9.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
