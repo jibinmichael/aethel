@@ -10,7 +10,6 @@ import NotionHeader from './components/NotionHeader'
 import SeedNode from './components/SeedNode'
 import NodeTypePopover from './components/NodeTypePopover'
 import HomePage from './components/HomePage'
-import synthesisStore from './stores/synthesisStore.js'
 
 import { 
   QuestionNode, 

@@ -2,7 +2,7 @@
 
 ## Quick Setup
 
-To enable AI synthesis in Lumina Notes, you need to configure your OpenAI API key:
+To enable AI features in Lumina Notes, you need to configure your OpenAI API key:
 
 1. Open the file `src/config/apiConfig.js`
 
@@ -23,13 +23,7 @@ To enable AI synthesis in Lumina Notes, you need to configure your OpenAI API ke
 
 ## Features Once Configured
 
-### 1. AI Synthesis with Node Citations
-- The AI will synthesize your nodes into a structured summary
-- Each synthesis includes citations like (N001, N002) referencing specific nodes
-- Updates automatically after 3 seconds of no changes
-- Minimum 2 nodes with content required
-
-### 2. Dynamic Placeholders
+### Dynamic Placeholders
 - Empty nodes connected to nodes with content will show contextual placeholders
 - Placeholders suggest next steps based on connected node content
 - Updates when new connections are made
@@ -42,11 +36,11 @@ To enable AI synthesis in Lumina Notes, you need to configure your OpenAI API ke
 
 - **Security**: Never commit your API key to version control
 - **Production**: In production, use environment variables instead of hardcoding
-- **Costs**: Be aware of OpenAI API costs - each synthesis request uses tokens
+- **Costs**: Be aware of OpenAI API costs - each placeholder request uses tokens
 
 ## Troubleshooting
 
-If synthesis isn't working:
+If placeholders aren't working:
 1. Check that `IS_CONFIGURED` is set to `true`
 2. Verify your API key is valid
 3. Check the browser console for error messages

@@ -1,6 +1,6 @@
 /**
  * Debug Logger for Lumina Notes AI System
- * Tracks synthesis operations and node mappings
+ * Tracks operations and node mappings
  */
 
 class DebugLogger {
@@ -21,25 +21,7 @@ class DebugLogger {
     console.log(`🔧 Lumina debug logging ${enabled ? 'enabled' : 'disabled'}`)
   }
 
-  // Log synthesis operation
-  logSynthesis(boardId, nodes, synthesis, duration) {
-    if (!this.isEnabled) return
 
-    const log = {
-      type: 'synthesis',
-      timestamp: new Date().toISOString(),
-      boardId,
-      nodeCount: nodes.length,
-      nodesWithContent: nodes.filter(n => n.data?.content?.trim()).length,
-      nodeIds: nodes.map(n => n.data?.refId || n.id),
-      synthesisLength: synthesis.length,
-      duration,
-      preview: synthesis.substring(0, 100) + '...'
-    }
-
-    this.addLog(log)
-    console.log('📊 Synthesis:', log)
-  }
 
   // Log placeholder generation
   logPlaceholder(nodeId, nodeType, connectedNodes, placeholder) {
