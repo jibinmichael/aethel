@@ -1,4 +1,17 @@
-const clientPromise = require('../db');
+const { MongoClient } = require('mongodb');
+
+let cachedClient = null;
+
+async function connectToDatabase() {
+  if (cachedClient) {
+    return cachedClient;
+  }
+
+  const client = new MongoClient(process.env.MONGODB_URI);
+  await client.connect();
+  cachedClient = client;
+  return client;
+}
 
 module.exports = async function handler(req, res) {
   const { method, query } = req;
@@ -9,7 +22,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const client = await clientPromise;
+    const client = await connectToDatabase();
     const db = client.db("aethel");
     const boardsCollection = db.collection("boards");
 

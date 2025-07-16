@@ -1,12 +1,30 @@
-const clientPromise = require('../db');
+const { MongoClient } = require('mongodb');
+
+let cachedClient = null;
+
+async function connectToDatabase() {
+  if (cachedClient) {
+    return cachedClient;
+  }
+
+  const client = new MongoClient(process.env.MONGODB_URI);
+  await client.connect();
+  cachedClient = client;
+  return client;
+}
 
 module.exports = async function handler(req, res) {
   const { method } = req;
 
+  console.log('🔗 API /boards called with method:', method);
+  console.log('🔑 MongoDB URI exists:', !!process.env.MONGODB_URI);
+
   try {
-    const client = await clientPromise;
+    console.log('🔌 Connecting to database...');
+    const client = await connectToDatabase();
     const db = client.db("aethel");
     const boardsCollection = db.collection("boards");
+    console.log('✅ Database connected successfully');
 
     switch (method) {
       case 'GET':
