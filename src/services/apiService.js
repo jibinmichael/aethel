@@ -13,6 +13,8 @@ class ApiService {
   async apiCall(endpoint, options = {}) {
     try {
       const url = `${this.baseUrl}${endpoint}`;
+      console.log('🌐 Making API call to:', url);
+      
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
@@ -21,13 +23,17 @@ class ApiService {
         ...options
       });
 
+      console.log('📡 API response status:', response.status);
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log('✅ API call successful:', data);
+      return data;
     } catch (error) {
-      console.error('API call failed:', error);
+      console.error('❌ API call failed:', error);
       throw error;
     }
   }
