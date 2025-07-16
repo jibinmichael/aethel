@@ -1,6 +1,6 @@
-import clientPromise from '../db';
+const clientPromise = require('../db');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const { method, query } = req;
   const { id } = query;
 
