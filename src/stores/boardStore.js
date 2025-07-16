@@ -96,27 +96,36 @@ class BoardStore {
 
   // Load boards from storage
   async loadBoardsFromStorage() {
+    console.log('🔄 Starting to load boards...');
+    
     try {
       // Initialize API service
       if (!apiService.isInitialized) {
         apiService.initialize();
       }
 
+      console.log('🌐 Attempting to load boards from API...');
+      
       // Try to load from API first
       const boards = await apiService.getBoards();
+      
+      console.log('📡 API response:', boards);
       
       if (boards && boards.length > 0) {
         this.boards = boards;
         this.activeBoardId = boards[0].id; // Set first board as active
         this.activeBoard = boards[0];
         
-        console.log(`📚 Loaded ${this.boards.length} boards from API`);
+        console.log(`✅ Loaded ${this.boards.length} boards from API`);
       } else {
+        console.log('📝 No boards found in API, creating default board...');
         // No existing data, initialize with default board
         await this.createDefaultBoard();
       }
     } catch (error) {
-      console.error('Failed to load boards from API:', error);
+      console.error('❌ Failed to load boards from API:', error);
+      console.log('🔄 Falling back to local storage...');
+      
       // Fallback to local storage
       try {
         const result = await storageManager.retrieve(this.storageConfig.boardsDataType);
@@ -131,10 +140,12 @@ class BoardStore {
           
           console.log(`📚 Loaded ${this.boards.length} boards from local storage`);
         } else {
+          console.log('📝 No local boards found, creating default board...');
           await this.createDefaultBoard();
         }
       } catch (localError) {
-        console.error('Failed to load boards from local storage:', localError);
+        console.error('❌ Failed to load boards from local storage:', localError);
+        console.log('📝 Creating default board as final fallback...');
         await this.createDefaultBoard();
       }
     }
@@ -178,15 +189,19 @@ class BoardStore {
 
   // Create default board if none exists
   async createDefaultBoard() {
-    const defaultBoard = this.createBoardObject('My First Canvas');
+    console.log('🆕 Creating default board...');
+    
+    const defaultBoard = this.createBoardObject('My First Board');
     this.boards = [defaultBoard];
     this.activeBoard = defaultBoard;
     this.activeBoardId = defaultBoard.id;
     
+    console.log('💾 Saving default board to storage...');
+    
     // Save immediately
     await this.saveBoardsToStorage(true);
     
-    console.log('🆕 Created default board');
+    console.log('✅ Created and saved default board:', defaultBoard.name);
   }
 
   // Get default preferences
@@ -259,13 +274,17 @@ class BoardStore {
     // Try to save to API first
     try {
       if (apiService.isInitialized) {
+        console.log('🌐 Saving boards to API...');
         for (const board of this.boards) {
+          console.log('💾 Saving board:', board.name);
           await apiService.saveBoard(board);
         }
-        console.log('💾 Saved boards to API');
+        console.log('✅ Successfully saved boards to API');
+      } else {
+        console.log('⚠️ API service not initialized, skipping API save');
       }
     } catch (error) {
-      console.error('Failed to save boards to API:', error);
+      console.error('❌ Failed to save boards to API:', error);
     }
 
     // Also save to local storage as backup
