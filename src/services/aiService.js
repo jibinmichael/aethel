@@ -1,5 +1,5 @@
 import OpenAI from 'openai'
-import API_CONFIG from '../config/apiConfig.js'
+import API_CONFIG from '../config/apiConfig'
 import debugLogger from '../utils/debugLogger.js'
 
 // Configuration
