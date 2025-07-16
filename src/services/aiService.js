@@ -1,6 +1,11 @@
 import OpenAI from 'openai'
-import API_CONFIG from '../config/apiConfig'
 import debugLogger from '../utils/debugLogger.js'
+
+// API Configuration (inlined to avoid import issues)
+const API_CONFIG = {
+  OPENAI_API_KEY: import.meta.env.VITE_OPENAI_API_KEY,
+  IS_CONFIGURED: !!import.meta.env.VITE_OPENAI_API_KEY && import.meta.env.VITE_OPENAI_API_KEY !== 'sk-YOUR-API-KEY-HERE'
+}
 
 // Configuration
 const AI_SERVICE_CONFIG = {
