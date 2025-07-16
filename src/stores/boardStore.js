@@ -7,6 +7,7 @@
 import autoSaveManager, { SAVE_PRIORITY } from '../utils/autoSave.js';
 import storageManager, { DATA_TYPES } from '../utils/storageManager.js';
 import userIdentity from '../utils/userIdentity.js';
+import apiService from '../services/apiService.js';
 
 class BoardStore {
   constructor() {
@@ -96,26 +97,46 @@ class BoardStore {
   // Load boards from storage
   async loadBoardsFromStorage() {
     try {
-      const result = await storageManager.retrieve(this.storageConfig.boardsDataType);
+      // Initialize API service
+      if (!apiService.isInitialized) {
+        apiService.initialize();
+      }
+
+      // Try to load from API first
+      const boards = await apiService.getBoards();
       
-      if (result.success && result.data) {
-        this.boards = Array.isArray(result.data.boards) ? result.data.boards : [];
-        this.activeBoardId = result.data.activeBoardId || null;
+      if (boards && boards.length > 0) {
+        this.boards = boards;
+        this.activeBoardId = boards[0].id; // Set first board as active
+        this.activeBoard = boards[0];
         
-        // Find active board object
-        if (this.activeBoardId) {
-          this.activeBoard = this.boards.find(b => b.id === this.activeBoardId);
-        }
-        
-        console.log(`📚 Loaded ${this.boards.length} boards from storage`);
+        console.log(`📚 Loaded ${this.boards.length} boards from API`);
       } else {
         // No existing data, initialize with default board
         await this.createDefaultBoard();
       }
     } catch (error) {
-      console.error('Failed to load boards:', error);
-      // Fallback to default board
-      await this.createDefaultBoard();
+      console.error('Failed to load boards from API:', error);
+      // Fallback to local storage
+      try {
+        const result = await storageManager.retrieve(this.storageConfig.boardsDataType);
+        
+        if (result.success && result.data) {
+          this.boards = Array.isArray(result.data.boards) ? result.data.boards : [];
+          this.activeBoardId = result.data.activeBoardId || null;
+          
+          if (this.activeBoardId) {
+            this.activeBoard = this.boards.find(b => b.id === this.activeBoardId);
+          }
+          
+          console.log(`📚 Loaded ${this.boards.length} boards from local storage`);
+        } else {
+          await this.createDefaultBoard();
+        }
+      } catch (localError) {
+        console.error('Failed to load boards from local storage:', localError);
+        await this.createDefaultBoard();
+      }
     }
   }
 
@@ -235,6 +256,19 @@ class BoardStore {
       version: '1.0.0'
     };
 
+    // Try to save to API first
+    try {
+      if (apiService.isInitialized) {
+        for (const board of this.boards) {
+          await apiService.saveBoard(board);
+        }
+        console.log('💾 Saved boards to API');
+      }
+    } catch (error) {
+      console.error('Failed to save boards to API:', error);
+    }
+
+    // Also save to local storage as backup
     if (autoSaveManager.isInitialized) {
       autoSaveManager.scheduleAutoSave(
         this.storageConfig.boardsDataType,
@@ -492,6 +526,16 @@ class BoardStore {
     if (board) {
       board.metadata.nodeCount = nodes?.length || 0;
       board.lastModified = new Date().toISOString();
+    }
+    
+    // Try to save to API first
+    try {
+      if (apiService.isInitialized) {
+        await apiService.saveNodes(boardId, nodes, edges);
+        console.log(`💾 Saved nodes to API for board: ${boardId}`);
+      }
+    } catch (error) {
+      console.error('Failed to save nodes to API:', error);
     }
     
     // Save immediately for user content changes
